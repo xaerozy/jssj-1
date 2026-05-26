@@ -1,0 +1,287 @@
+<view class="container safe-bottom">
+  <!-- 标题与状态 -->
+  <view class="header-section">
+    <view class="project-title">{{project.title}}</view>
+    <view class="project-meta">
+      <text class="meta-item">发起人：{{project.creator}}</text>
+      <text class="meta-item">日期：{{project.createTime}}</text>
+    </view>
+    <view class="status-box-wrap">
+      当前状态：<text class="badge badge-{{project.status}}">{{statusTextMap[project.status]}}</text>
+    </view>
+  </view>
+
+  <!-- 比价核心表格 -->
+  <view class="card table-card">
+    <view class="card-title-row" style="margin-bottom: 24rpx;">
+      <view class="card-title" style="margin-bottom:0;">📊 报价明细对比</view>
+    </view>
+
+    <!-- 物资对比表格 (横向滚动) -->
+    <scroll-view scroll-x class="table-scroll">
+      <view class="comparison-table">
+        <!-- 双层表头表头行 -->
+        <view class="tr th-row">
+          <view class="td no-col">序号</view>
+          <view class="td name-col">设备名称</view>
+          <view class="td model-col">型号</view>
+          <view class="td unit-col">单位</view>
+          <view class="td qty-col">数量</view>
+          
+          <view class="td sup-double-col" wx:for="{{project.suppliers}}" wx:key="*this">
+            <view class="sup-top-row">
+              <view class="sup-header-name">{{item}}</view>
+              <view class="rank-tag" wx:if="{{index === lowestSupplierIndex}}">🏆 推荐低价</view>
+            </view>
+            <view class="sup-bottom-row">
+              <view class="sub-th-price">单价</view>
+              <view class="sub-th-total">总价</view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 行明细 -->
+        <view class="tr" wx:for="{{project.items}}" wx:key="index" wx:for-item="item" wx:for-index="itemIdx">
+          <view class="td no-col">{{itemIdx + 1}}</view>
+          <view class="td name-col">{{item.name}}</view>
+          <view class="td model-col" style="color: #4b5563;">{{item.model || '-'}}</view>
+          <view class="td unit-col">{{item.unit}}</view>
+          <view class="td qty-col">{{item.qty}}</view>
+          
+          <view class="td sup-double-col {{item.quotes[supIdx] === item.lowestQuote ? 'highlight-price-cell' : ''}}" wx:for="{{project.suppliers}}" wx:key="*this" wx:for-item="supName" wx:for-index="supIdx">
+            <view class="sup-price-val {{item.quotes[supIdx] === item.lowestQuote ? 'font-bold-green' : ''}}">¥{{item.quotesFormatted[supIdx]}}</view>
+            <view class="sup-total-val">¥{{item.subTotalsFormatted[supIdx]}}</view>
+          </view>
+        </view>
+
+        <!-- 总计行 -->
+        <view class="tr total-row">
+          <view class="td base-total-label font-bold">总报价合计</view>
+          
+          <view class="td sup-double-col {{totalCosts[supIdx] === lowestTotalCost ? 'highlight-total-cell' : ''}}" wx:for="{{project.suppliers}}" wx:key="*this" wx:for-item="supName" wx:for-index="supIdx">
+            <view class="sup-price-val">-</view>
+            <view class="sup-total-val font-bold">¥{{totalCostsFormatted[supIdx]}}</view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="scroll-tip">💡 报价对比表可左右滑动，绿色高亮为最低报价项</view>
+  </view>
+
+  <!-- 其它商务条款比较 (隐藏全部空白项，仅当至少一项有数据时显示) -->
+  <view class="card" wx:if="{{hasAnyClause}}">
+    <view class="card-title">🤝 商务条款及其他对比</view>
+    <view class="clause-compare-box">
+      <!-- 交货期 (非空显示) -->
+      <view class="clause-section" wx:if="{{hasDeliveryTime}}">
+        <view class="clause-section-title">📅 交货期比对</view>
+        <view class="clause-grid">
+          <block wx:for="{{project.suppliers}}" wx:key="*this">
+            <view class="clause-cell" wx:if="{{project.deliveryTime[index]}}">
+              <view class="clause-sup">{{item}}</view>
+              <view class="clause-val">{{project.deliveryTime[index]}}</view>
+            </view>
+          </block>
+        </view>
+      </view>
+
+      <!-- 质保方案 (非空显示) -->
+      <view class="clause-section" wx:if="{{hasWarranty}}">
+        <view class="clause-section-title">🛡️ 质保条件比对</view>
+        <view class="clause-grid">
+          <block wx:for="{{project.suppliers}}" wx:key="*this">
+            <view class="clause-cell" wx:if="{{project.warranty[index]}}">
+              <view class="clause-sup">{{item}}</view>
+              <view class="clause-val">{{project.warranty[index]}}</view>
+            </view>
+          </block>
+        </view>
+      </view>
+
+      <!-- 付款条件 (非空显示) -->
+      <view class="clause-section" wx:if="{{hasPaymentTerm}}">
+        <view class="clause-section-title">💰 付款节点比对</view>
+        <view class="clause-grid">
+          <block wx:for="{{project.suppliers}}" wx:key="*this">
+            <view class="clause-cell" wx:if="{{project.paymentTerm[index]}}">
+              <view class="clause-sup">{{item}}</view>
+              <view class="clause-val">{{project.paymentTerm[index]}}</view>
+            </view>
+          </block>
+        </view>
+      </view>
+    </view>
+
+    <!-- 采购备注 -->
+    <view class="remarks-box" wx:if="{{project.remarks}}">
+      <view class="remarks-title">💡 采购员推荐原因说明：</view>
+      <view class="remarks-content">{{project.remarks}}</view>
+    </view>
+  </view>
+
+  <!-- 审批确认记录（时间轴） -->
+  <view class="card">
+    <view class="card-title">📜 签字确认进度</view>
+    <view class="timeline">
+      <view class="timeline-item {{item.status === 'approved' ? 'success' : (item.status === 'rejected' ? 'danger' : 'pending')}}" wx:for="{{project.approvals}}" wx:key="role">
+        <view class="timeline-node">
+          <text class="node-icon" wx:if="{{item.status === 'approved'}}">✓</text>
+          <text class="node-icon" wx:elif="{{item.status === 'rejected'}}">✗</text>
+          <text class="node-icon" wx:else>⋯</text>
+        </view>
+        <view class="timeline-content">
+          <view class="timeline-header">
+            <text class="timeline-role">{{item.userName}}确认</text>
+            <text class="timeline-status-tag {{item.status}}">
+              {{item.status === 'approved' ? '已确认' : (item.status === 'rejected' ? '已驳回' : '等待中')}}
+            </text>
+          </view>
+          
+          <view class="timeline-body" wx:if="{{item.status !== 'pending'}}">
+            <view class="approver-info" wx:if="{{item.userName}}">
+              确认人员：<text class="approver-name">{{item.userName}}</text>
+            </view>
+            <view class="approval-time" wx:if="{{item.time}}">
+              确认时间：{{item.time}}
+            </view>
+            <view class="approval-comment" wx:if="{{item.comment}}">
+              确认意见：“ {{item.comment}} ”
+            </view>
+            
+            <!-- 电子手写签名图片预览 -->
+            <view class="signature-preview-box" wx:if="{{item.signature}}">
+              <text class="sig-title">电子手写签名：</text>
+              <view class="signature-img-wrapper">
+                <image class="signature-img" src="{{item.signature}}" mode="aspectFit" />
+              </view>
+            </view>
+            <view class="signature-preview-box" wx:elif="{{item.status === 'approved'}}">
+              <text class="sig-title">授权确认凭证：</text>
+              <view class="mock-signature-stamp">{{item.userName}} (已授权确认)</view>
+            </view>
+          </view>
+          <view class="timeline-body pending" wx:else>
+            <text class="waiting-hint">等待 {{item.userName}} 登录并签字确认...</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 发起人专属控制面板 (撤回/编辑修改) -->
+  <view class="card" wx:if="{{isMyProject && project.status !== 'approved' && project.status !== 'rejected'}}" style="border: 2rpx solid var(--primary-color);">
+    <view class="card-title" style="color:var(--primary-color); margin-bottom: 12rpx;">⚙️ 发起人控制面板</view>
+    <view style="font-size:24rpx; color:var(--text-muted); margin-bottom:20rpx;">作为此单据的发起人，您可以进行撤回或重新修改编辑操作。</view>
+    <view class="creator-actions" style="display:flex; flex-direction:column; gap:20rpx;">
+      <!-- 如果没有任何批示，或者已被撤回为草稿，允许直接编辑修改 -->
+      <button 
+        class="btn-primary" 
+        style="width: 100% !important; height:86rpx;" 
+        wx:if="{{isNoApprovals || project.status === 'draft'}}" 
+        bindtap="onEditProject"
+        hover-class="hover-btn"
+      >
+        ✍️ 修改并重新送审
+      </button>
+      
+      <!-- 如果已经发起了，且尚未归档/驳回，允许撤回 -->
+      <button 
+        class="btn-secondary" 
+        style="width: 100% !important; height:86rpx; border-color:var(--warning-color) !important; color:var(--warning-color) !important;" 
+        wx:if="{{project.status !== 'draft'}}" 
+        bindtap="onWithdrawProject"
+        hover-class="hover-btn"
+      >
+        ↩️ 撤回审批 (重置为草稿)
+      </button>
+    </view>
+  </view>
+
+  <!-- 导出模块（审批已通过） -->
+  <view class="export-card" wx:if="{{project.status === 'approved'}}">
+    <view class="export-hint">🎉 本比价单已全部签字确认通过，现可导出不可修改的PDF报告</view>
+    <button class="btn-primary export-btn" hover-class="hover-btn" bindtap="onExportReport">
+      📄 导出 PDF 签字确认版
+    </button>
+  </view>
+
+  <!-- 签字审核操作面板 (待当前登录用户审批) -->
+  <view class="card approve-card" wx:if="{{needMyApproval}}">
+    <view class="card-title text-warning">⚡ 您的审批确认</view>
+    <view class="approve-desc">请认真核对比价单数据。确认无误后请在下方手写签字，并提交确认。</view>
+    
+    <view class="form-group">
+      <view style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12rpx;">
+        <text class="form-label" style="margin-bottom: 0;">确认意见/备注 (必填) *</text>
+        <button type="button" class="voice-btn" style="width: 60rpx !important; height: 60rpx !important; font-size: 26rpx !important;" bindtap="onStartVoice" data-field="comment">🎙️</button>
+      </view>
+      <textarea class="form-textarea" placeholder="请输入您的意见，如：同意采购，价格合理。" bindinput="onCommentInput" value="{{comment}}"></textarea>
+    </view>
+
+    <!-- 手写签名面板 -->
+    <view class="form-group">
+      <view class="sig-header">
+        <text class="form-label">👋 电子手写签字确认 (意见和签字均为必填) *</text>
+        <button class="clear-sig-btn" bindtap="onOpenSigModal" wx:if="{{tempSignaturePath}}">重签/清除</button>
+      </view>
+      
+      <!-- 点击此签名预览位置，即可放大签名框进行大屏书写 -->
+      <view class="signature-canvas-container" bindtap="onOpenSigModal" hover-class="hover-item" style="cursor: pointer; display: flex; align-items: center; justify-content: center; background-color: #fafbfc;">
+        <image class="signature-preview-img" src="{{tempSignaturePath}}" mode="aspectFit" style="z-index:5;" wx:if="{{tempSignaturePath}}"></image>
+        <view class="canvas-placeholder" style="position:static; text-align:center; padding: 40rpx; font-weight:700; color:#3b82f6;" wx:else>
+          👆 点击此处放大签名框进行大屏签字 *
+        </view>
+      </view>
+    </view>
+
+    <view class="approve-actions">
+      <button class="btn-primary approve-submit-btn" hover-class="hover-btn" bindtap="onSubmitApproval" data-action="approve">
+        ✍️ 同意并确认
+      </button>
+      <button class="btn-secondary approve-reject-btn" hover-class="hover-btn" bindtap="onSubmitApproval" data-action="reject">
+        驳回修改
+      </button>
+    </view>
+  </view>
+
+  <!-- 🎙️ 语音识别动画对话框 -->
+  <view class="voice-modal {{voiceRecording ? 'active' : ''}}">
+    <view class="voice-modal-content">
+      <view class="voice-wave-box">
+        <view class="voice-wave-bar bar-1"></view>
+        <view class="voice-wave-bar bar-2"></view>
+        <view class="voice-wave-bar bar-3"></view>
+        <view class="voice-wave-bar bar-4"></view>
+      </view>
+      <view class="voice-status-title">正在倾听中...</view>
+      <view class="voice-status-desc">请对准话筒说出您的内容</view>
+      <button type="button" class="voice-stop-btn" bindtap="onStopVoice">完成识别并填入</button>
+    </view>
+  </view>
+
+  <!-- ✍️ 全屏大屏签字放大弹窗 (一直挂载，利用 CSS 滑动显示，解决 Canvas 初始化失效问题) -->
+  <view class="signature-fullscreen-modal {{sigModalActive ? 'active' : ''}}">
+    <view class="sig-modal-header">
+      <text class="sig-modal-title">✍️ 电子签字 (请横置手机在下方书写)</text>
+      <text class="sig-modal-close" bindtap="onCloseSigModal">✕ 取消关闭</text>
+    </view>
+    <view class="sig-modal-canvas-wrap">
+      <canvas 
+        canvas-id="modalSigCanvas" 
+        class="modal-sig-canvas" 
+        disable-scroll="true"
+        bindtouchstart="onModalTouchStart"
+        bindtouchmove="onModalTouchMove"
+        bindtouchend="onModalTouchEnd"
+      ></canvas>
+      <view class="canvas-placeholder" wx:if="{{!modalSigTyped}}">
+        <view class="rotate-tip-text">➔ 请横置手机在此处签名 ➔</view>
+      </view>
+    </view>
+    <view class="sig-modal-footer">
+      <button class="modal-btn-clear" bindtap="onClearModalSig">重签/清除</button>
+      <button class="modal-btn-confirm" bindtap="onConfirmModalSig">确认签名</button>
+    </view>
+  </view>
+</view>

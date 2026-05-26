@@ -1,0 +1,422 @@
+<view class="container safe-bottom">
+  <view class="header-banner">
+    <view class="banner-title">创建采购比价单</view>
+    <view class="banner-subtitle">新建多方供应商比价数据，自定义审批流程</view>
+  </view>
+
+  <!-- 🤖 智能导入面板 -->
+  <view class="card ocr-card">
+    <view class="card-title">🤖 智能比价导入</view>
+    
+    <view class="ocr-buttons">
+      <button type="button" class="ocr-action-btn file-btn" bindtap="onUploadOCRFile" hover-class="hover-btn">📸 上传截图/PDF/Excel文件</button>
+      <button type="button" class="ocr-action-btn paste-btn" bindtap="onTogglePasteBox" hover-class="hover-btn">📋 粘贴报价文本解析</button>
+    </view>
+
+    <!-- 粘贴解析输入区 -->
+    <view class="paste-box-wrap" wx:if="{{showPasteBox}}">
+      <textarea class="form-textarea paste-textarea" placeholder="请在此粘贴报价文本。格式如：\n宁德时代：储能电池 2套 单价285万元，控制柜 2套 单价18万元。\n比亚迪：储能电池 2套 单价290万元，控制柜 2套 单价16万元。" bindinput="onPasteTextInput" value="{{pasteText}}"></textarea>
+      <button type="button" class="btn-primary" style="height: 64rpx; font-size: 24rpx; margin-top: 16rpx; width: 220rpx; line-height: 1;" bindtap="onAnalyzePasteText">⚡ 解析并填入</button>
+    </view>
+  </view>
+
+  <form bindsubmit="onSubmit">
+    <!-- 基础信息 -->
+    <view class="card" style="overflow: visible;">
+      <view class="card-title">📝 1. 基本信息</view>
+      <view class="form-group" style="position: relative; z-index: 100;">
+        <text class="form-label">比价项目标题 *</text>
+        <view class="input-voice-wrap">
+          <input name="title" class="form-input" placeholder="例如：2026年XXX物资采购比价申请" value="{{title}}" bindinput="onTitleInput" required />
+          <button type="button" class="voice-btn" bindtap="onStartVoice" data-field="title">🎙️</button>
+          <button type="button" class="voice-btn" bindtap="onToggleTitleHistory" style="background-color: #fafbfc !important; font-size: 20rpx !important; color:#888 !important;">▼</button>
+        </view>
+        <!-- 历史记录下拉框 -->
+        <view class="history-dropdown-box" wx:if="{{showTitleHistory}}">
+          <view class="history-item" wx:for="{{titleHistory}}" wx:key="*this" bindtap="onSelectTitleHistory" data-val="{{item}}">
+            {{item}}
+          </view>
+          <view class="history-empty" wx:if="{{titleHistory.length === 0}}">暂无历史记录</view>
+        </view>
+      </view>
+      <view class="form-group">
+        <text class="form-label">申请人</text>
+        <input class="form-input disabled" value="{{currentUser.name}}" disabled />
+      </view>
+    </view>
+
+    <!-- 供应商名单 (动态增删) -->
+    <view class="card">
+      <view class="card-title-row">
+        <view class="card-title">🏢 2. 参比供应商名单 ({{suppliers.length}}家)</view>
+        <button type="button" class="add-row-btn" bindtap="onAddSupplier" style="background-color:#e0f2fe; color:#0284c7; border: 1rpx solid rgba(2,132,199,0.2);">+ 增加供应商</button>
+      </view>
+      
+      <view class="form-group" wx:for="{{suppliers}}" wx:key="index">
+        <view style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12rpx;">
+          <text class="form-label" style="margin-bottom:0;">供应商 {{index + 1}} 名称 *</text>
+          <text class="delete-row-link" bindtap="onDeleteSupplier" data-index="{{index}}" wx:if="{{suppliers.length > 2}}">删除该商</text>
+        </view>
+        <view class="input-voice-wrap">
+          <input 
+            class="form-input" 
+            placeholder="请输入供应商全称" 
+            value="{{item}}" 
+            bindinput="onSupplierInput" 
+            data-index="{{index}}"
+            required
+          />
+          <button type="button" class="voice-btn" bindtap="onStartVoice" data-field="suppliers" data-index="{{index}}">🎙️</button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 采购项与报价 -->
+    <view class="card">
+      <view class="card-title-row">
+        <view class="card-title">🛒 3. 物资明细及多方报价</view>
+        <button type="button" class="add-row-btn" bindtap="onAddItemRow">+ 添加物资</button>
+      </view>
+
+      <!-- 💡 录入模式切换选择器 -->
+      <view class="fill-mode-toggle" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24rpx; background-color:#f0f4fa; padding:12rpx 20rpx; border-radius:12rpx;">
+        <text style="font-size:24rpx; font-weight:700; color:#1a305c;">📝 报价录入模式：</text>
+        <view class="mode-buttons" style="display:flex; gap:16rpx;">
+          <view class="mode-btn {{fillMode === 'item' ? 'active' : ''}}" bindtap="onToggleFillMode" data-mode="item" style="font-size:22rpx; padding:8rpx 20rpx; border-radius:8rpx; font-weight:700;">按物资依次填</view>
+          <view class="mode-btn {{fillMode === 'supplier' ? 'active' : ''}}" bindtap="onToggleFillMode" data-mode="supplier" style="font-size:22rpx; padding:8rpx 20rpx; border-radius:8rpx; font-weight:700;">按公司填清单</view>
+        </view>
+      </view>
+
+      <!-- 模式 A：按物资依次填写各家价格 -->
+      <view class="items-list" wx:if="{{fillMode === 'item'}}">
+        <view class="item-row-card" wx:for="{{items}}" wx:key="index" wx:for-index="itemIndex">
+          <view class="item-row-header">
+            <text class="item-index-title">物资明细 #{{itemIndex + 1}}</text>
+            <view class="delete-row-link" bindtap="onDeleteItemRow" data-index="{{itemIndex}}" wx:if="{{items.length > 1}}">删除</view>
+          </view>
+
+          <view class="form-grid">
+            <view class="form-group span-2">
+              <text class="form-label">物资名称 *</text>
+              <view class="input-voice-wrap">
+                <input 
+                  class="form-input" 
+                  placeholder="例如：云服务器" 
+                  value="{{item.name}}" 
+                  bindinput="onItemFieldInput" 
+                  data-index="{{itemIndex}}" 
+                  data-field="name" 
+                  required 
+                />
+                <button type="button" class="voice-btn" bindtap="onStartVoice" data-field="itemName" data-index="{{itemIndex}}">🎙️</button>
+              </view>
+            </view>
+            <view class="form-group span-2">
+              <text class="form-label">规格型号</text>
+              <view class="input-voice-wrap">
+                <input 
+                  class="form-input" 
+                  placeholder="例如：i7/32G/1T" 
+                  value="{{item.model}}" 
+                  bindinput="onItemFieldInput" 
+                  data-index="{{itemIndex}}" 
+                  data-field="model" 
+                />
+                <button type="button" class="voice-btn" bindtap="onStartVoice" data-field="itemModel" data-index="{{itemIndex}}">🎙️</button>
+              </view>
+            </view>
+            <view class="form-group">
+              <text class="form-label">数量 *</text>
+              <input 
+                type="number" 
+                class="form-input" 
+                placeholder="数量" 
+                value="{{item.qty}}" 
+                bindinput="onItemFieldInput" 
+                data-index="{{itemIndex}}" 
+                data-field="qty" 
+                required 
+              />
+            </view>
+            <view class="form-group">
+              <text class="form-label">单位 *</text>
+              <input 
+                class="form-input" 
+                placeholder="如:台" 
+                value="{{item.unit}}" 
+                bindinput="onItemFieldInput" 
+                data-index="{{itemIndex}}" 
+                data-field="unit" 
+                required 
+              />
+            </view>
+          </view>
+
+          <!-- 动态报价列 -->
+          <view class="quote-section-title">供应商单价报价（单价/元）：</view>
+          <view class="quotes-grid">
+            <view class="quote-input-box" wx:for="{{suppliers}}" wx:key="index" wx:for-item="supName" wx:for-index="supIdx">
+              <text class="quote-label-short">{{supName || '供应商 ' + (supIdx+1)}}</text>
+              <input 
+                type="digit" 
+                class="form-input quote-input" 
+                placeholder="报价单价" 
+                value="{{item.quotes[supIdx]}}" 
+                bindinput="onQuoteInput" 
+                data-item-index="{{itemIndex}}" 
+                data-supplier-index="{{supIdx}}" 
+                required
+              />
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 模式 B：按供应商（公司）填写完整物资清单 -->
+      <view class="supplier-list-fill" wx:if="{{fillMode === 'supplier'}}">
+        <view class="fill-supplier-tabs" style="display:flex; gap:16rpx; overflow-x:auto; margin-bottom:24rpx; padding-bottom:10rpx; -webkit-overflow-scrolling: touch;">
+          <view 
+            class="fill-sup-tab {{currentFillSupplierIndex === index ? 'active' : ''}}" 
+            wx:for="{{suppliers}}" 
+            wx:key="index"
+            bindtap="onSelectFillSupplier"
+            data-index="{{index}}"
+            style="flex-shrink:0; font-size:24rpx; font-weight:700; padding:12rpx 24rpx; border-radius:12rpx; border:2rpx solid #e5e7eb; background-color:#f8fafc;"
+          >
+            🏢 {{item || '供应商 ' + (index+1)}}
+          </view>
+        </view>
+
+        <view class="items-list-by-sup">
+          <view class="item-row-card" wx:for="{{items}}" wx:key="index" wx:for-index="itemIndex">
+            <view class="item-row-header">
+              <text class="item-index-title">物资明细 #{{itemIndex + 1}}</text>
+              <view class="delete-row-link" bindtap="onDeleteItemRow" data-index="{{itemIndex}}" wx:if="{{items.length > 1}}">删除该项</view>
+            </view>
+
+            <view class="form-grid" style="margin-bottom:16rpx;">
+              <view class="form-group span-2">
+                <text class="form-label">物资名称 *</text>
+                <input 
+                  class="form-input" 
+                  placeholder="例如：云服务器" 
+                  value="{{item.name}}" 
+                  bindinput="onItemFieldInput" 
+                  data-index="{{itemIndex}}" 
+                  data-field="name" 
+                  required 
+                />
+              </view>
+              <view class="form-group span-2">
+                <text class="form-label">规格型号</text>
+                <input 
+                  class="form-input" 
+                  placeholder="例如：i7/32G/1T" 
+                  value="{{item.model}}" 
+                  bindinput="onItemFieldInput" 
+                  data-index="{{itemIndex}}" 
+                  data-field="model" 
+                />
+              </view>
+              <view class="form-group">
+                <text class="form-label">数量 *</text>
+                <input 
+                  type="number" 
+                  class="form-input" 
+                  placeholder="数量" 
+                  value="{{item.qty}}" 
+                  bindinput="onItemFieldInput" 
+                  data-index="{{itemIndex}}" 
+                  data-field="qty" 
+                  required 
+                />
+              </view>
+              <view class="form-group">
+                <text class="form-label">单位 *</text>
+                <input 
+                  class="form-input" 
+                  placeholder="单位" 
+                  value="{{item.unit}}" 
+                  bindinput="onItemFieldInput" 
+                  data-index="{{itemIndex}}" 
+                  data-field="unit" 
+                  required 
+                />
+              </view>
+            </view>
+
+            <view class="form-group" style="margin-bottom:0; background-color:#eff6ff; padding:16rpx; border-radius:12rpx; border: 1rpx solid #bfdbfe;">
+              <text class="form-label" style="color:#1d4ed8; font-weight:700; margin-bottom:8rpx;">
+                公司【{{suppliers[currentFillSupplierIndex] || '当前供应商'}}】的单价报价 *
+              </text>
+              <input 
+                type="digit" 
+                class="form-input" 
+                style="background-color:#ffffff; border-color:#3b82f6;"
+                placeholder="请输入单价" 
+                value="{{item.quotes[currentFillSupplierIndex]}}" 
+                bindinput="onQuoteInput" 
+                data-item-index="{{itemIndex}}" 
+                data-supplier-index="{{currentFillSupplierIndex}}" 
+                required
+              />
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 其他商务条件对比 (非必填) -->
+    <view class="card">
+      <view class="card-title">🤝 4. 其它商务条款比对 (选填)</view>
+      
+      <!-- 交货期 -->
+      <view class="clause-group">
+        <text class="clause-title">📅 交货期</text>
+        <view class="clause-inputs">
+          <view class="clause-input-box" wx:for="{{suppliers}}" wx:key="index">
+            <text class="clause-label-short">{{item || '供应商'+(index+1)}}</text>
+            <input 
+              class="form-input" 
+              placeholder="交货周期(选填)" 
+              value="{{deliveryTime[index]}}" 
+              bindinput="onClauseInput" 
+              data-type="deliveryTime" 
+              data-index="{{index}}"
+            />
+          </view>
+        </view>
+      </view>
+
+      <!-- 质保条款 -->
+      <view class="clause-group">
+        <text class="clause-title">🛡️ 质保条款</text>
+        <view class="clause-inputs">
+          <view class="clause-input-box" wx:for="{{suppliers}}" wx:key="index">
+            <text class="clause-label-short">{{item || '供应商'+(index+1)}}</text>
+            <input 
+              class="form-input" 
+              placeholder="质保方案(选填)" 
+              value="{{warranty[index]}}" 
+              bindinput="onClauseInput" 
+              data-type="warranty" 
+              data-index="{{index}}"
+            />
+          </view>
+        </view>
+      </view>
+
+      <!-- 付款方式 -->
+      <view class="clause-group">
+        <text class="clause-title">💰 付款条件</text>
+        <view class="clause-inputs">
+          <view class="clause-input-box" wx:for="{{suppliers}}" wx:key="index">
+            <text class="clause-label-short">{{item || '供应商'+(index+1)}}</text>
+            <input 
+              class="form-input" 
+              placeholder="付款节点(选填)" 
+              value="{{paymentTerm[index]}}" 
+              bindinput="onClauseInput" 
+              data-type="paymentTerm" 
+              data-index="{{index}}"
+            />
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 备注与自定义审批路径 -->
+    <view class="card">
+      <view class="card-title">⚙️ 5. 其它设置与自定义审批</view>
+      
+      <view class="form-group">
+        <view style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12rpx;">
+          <text class="form-label" style="margin-bottom: 0;">采购推荐与说明备注</text>
+          <button type="button" class="voice-btn" style="width: 60rpx !important; height: 60rpx !important; font-size: 26rpx !important;" bindtap="onStartVoice" data-field="remarks">🎙️</button>
+        </view>
+        <textarea name="remarks" class="form-textarea" placeholder="填写说明理由，例如推荐选择某供应商的原因..." bindinput="onRemarksInput" value="{{remarks}}"></textarea>
+      </view>
+
+      <!-- 自定义依次审批路径 -->
+      <view class="form-group">
+        <view style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20rpx;">
+          <text class="form-label" style="margin-bottom:0;">点选依次需要审批的人员（按部门顺序排序） *</text>
+          <button type="button" class="clear-sig-btn" style="padding: 4rpx 16rpx; line-height: 1.5; font-size: 20rpx; margin: 0;" bindtap="onResetApprovalPath">重置路径</button>
+        </view>
+        
+
+
+        <!-- 工程部行 -->
+        <view class="dept-selection-row" style="margin-bottom: 16rpx; background-color: #f8fafc; padding: 12rpx; border-radius: 12rpx; border: 1rpx solid #e2e8f0;">
+          <view class="dept-label" style="font-size: 22rpx; font-weight: bold; color: #475569; margin-bottom: 8rpx;">工程部：</view>
+          <view class="approver-buttons-pool" style="display:flex; flex-wrap:wrap; gap:12rpx; margin-bottom:0;">
+            <button 
+              type="button" 
+              class="approver-pool-btn {{selectedApproversMap[item] ? 'selected-approver' : ''}}" 
+              wx:for="{{engineeringApprovers}}" 
+              wx:key="*this"
+              bindtap="onSelectEngineering" 
+              data-name="{{item}}"
+              hover-class="hover-btn"
+              style="margin: 0; font-size: 22rpx; padding: 6rpx 18rpx; height: auto; line-height: 1.5; border-radius: 20rpx;"
+            >
+              + {{item}}
+            </button>
+          </view>
+        </view>
+
+        <!-- 项目部行 -->
+        <view class="dept-selection-row" style="margin-bottom: 20rpx; background-color: #f8fafc; padding: 12rpx; border-radius: 12rpx; border: 1rpx solid #e2e8f0;">
+          <view class="dept-label" style="font-size: 22rpx; font-weight: bold; color: #475569; margin-bottom: 8rpx;">项目部：</view>
+          <view class="approver-buttons-pool" style="display:flex; flex-wrap:wrap; gap:12rpx; margin-bottom:0;">
+            <button 
+              type="button" 
+              class="approver-pool-btn {{selectedApproversMap[item] ? 'selected-approver' : ''}}" 
+              wx:for="{{projectApprovers}}" 
+              wx:key="*this"
+              bindtap="onSelectProject" 
+              data-name="{{item}}"
+              hover-class="hover-btn"
+              style="margin: 0; font-size: 22rpx; padding: 6rpx 18rpx; height: auto; line-height: 1.5; border-radius: 20rpx;"
+            >
+              + {{item}}
+            </button>
+          </view>
+        </view>
+
+        <!-- 路径可视化链条 -->
+        <view class="path-preview-box">
+          <view class="path-title">当前定制审批链条为：</view>
+          <view class="path-chain" wx:if="{{customApprovalPath.length > 0}}">
+            <block wx:for="{{customApprovalPath}}" wx:key="*this">
+              <text class="path-node">{{item}}</text>
+              <text class="path-arrow" wx:if="{{index < customApprovalPath.length - 1}}">➜</text>
+            </block>
+          </view>
+          <view class="path-empty" wx:else>⚠️ 请依次点选人员，系统将按 工程部 ➜ 项目部 排序生成审批流</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="action-bar">
+      <button class="btn-primary form-submit-btn" form-type="submit" hover-class="hover-btn">🚀 提交并送审</button>
+      <button class="btn-secondary form-cancel-btn" bindtap="onCancel">取消返回</button>
+    </view>
+  </form>
+
+  <!-- 语音识别动画对话框 -->
+  <view class="voice-modal {{voiceRecording ? 'active' : ''}}">
+    <view class="voice-modal-content">
+      <view class="voice-wave-box">
+        <view class="voice-wave-bar bar-1"></view>
+        <view class="voice-wave-bar bar-2"></view>
+        <view class="voice-wave-bar bar-3"></view>
+        <view class="voice-wave-bar bar-4"></view>
+      </view>
+      <view class="voice-status-title">正在倾听中...</view>
+      <view class="voice-status-desc">请对准话筒说出您的内容</view>
+      <button type="button" class="voice-stop-btn" bindtap="onStopVoice">完成识别并填入</button>
+    </view>
+  </view>
+</view>

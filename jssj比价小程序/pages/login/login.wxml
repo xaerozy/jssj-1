@@ -1,0 +1,94 @@
+<view class="login-container">
+  <!-- 装饰背景 -->
+  <view class="header-bg"></view>
+
+  <view class="logo-area">
+    <view class="logo-box">⚖️</view>
+    <view class="app-title">采购比价与签字确认系统</view>
+    <view class="app-subtitle">Procurement Comparison & Electronic Signature</view>
+  </view>
+
+  <view class="login-card">
+    <!-- 选项卡切换 -->
+    <view class="login-tabs" wx:if="{{roles.length > 0}}">
+      <view class="login-tab {{activeTab === 'login' ? 'active' : ''}}" bindtap="onTabSwitch" data-tab="login">已有账号登录</view>
+      <view class="login-tab {{activeTab === 'register' ? 'active' : ''}}" bindtap="onTabSwitch" data-tab="register">实名注册</view>
+    </view>
+    <view class="login-tabs-single" wx:else>
+      <view class="single-tab-title">📝 实名注册并登录</view>
+    </view>
+
+    <!-- 登录视图 -->
+    <view class="tab-content" wx:if="{{activeTab === 'login'}}">
+      <view class="card-desc">💡 选择下方系统预设的账号即可快速登录，体验各岗位审批确认流程：</view>
+      
+      <scroll-view class="role-scroll" scroll-y>
+        <view class="role-list">
+          <view 
+            class="role-item" 
+            wx:for="{{roles}}" 
+            wx:key="name" 
+            bindtap="onSelectRole" 
+            data-index="{{index}}"
+            hover-class="hover-item"
+          >
+            <view class="role-avatar">{{item.role[0]}}</view>
+            <view class="role-info">
+              <view class="role-name">{{item.name}}</view>
+              <view class="role-tag">{{item.role}}</view>
+              <view class="role-desc">{{item.desc}}</view>
+            </view>
+            <!-- 🗑️ 注销/删除已有账户卡片 -->
+            <view class="delete-role-btn" catchtap="onDeleteRole" data-index="{{index}}" hover-class="delete-btn-hover">🗑️</view>
+            <view class="enter-arrow">➔</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 注册视图 -->
+    <view class="tab-content" wx:if="{{activeTab === 'register'}}">
+      <view class="card-desc">💡 响应实名制要求，请输入您的真实姓名，并选择岗位身份以完成注册。</view>
+      
+      <button class="btn-import-wechat" open-type="getPhoneNumber" bindgetphonenumber="onGetPhoneNumber" hover-class="hover-btn">
+        🟢 微信一键导入注册信息
+      </button>
+
+      <form bindsubmit="onRegister">
+        <view class="form-group" style="margin-top: 20rpx;">
+          <text class="form-label">实名手机号 *</text>
+          <view class="phone-input-wrap">
+            <input name="phone" class="form-input" type="number" placeholder="自动获取或手动输入" value="{{regPhone}}" bindinput="onPhoneInput" required />
+          </view>
+        </view>
+        <view class="form-group">
+          <text class="form-label">真实姓名 *</text>
+          <input name="realName" class="form-input" placeholder="请输入您的真实姓名" value="{{regRealName}}" required />
+        </view>
+        <view class="form-group">
+          <text class="form-label">您的岗位身份 (点击选择) *</text>
+          <view class="role-select-grid">
+            <view 
+              class="role-select-btn {{selectedRoleIndex === index ? 'active' : ''}}" 
+              wx:for="{{identityRoles}}" 
+              wx:key="*this" 
+              bindtap="onSelectIdentityRole" 
+              data-index="{{index}}"
+            >
+              {{item}}
+            </view>
+          </view>
+        </view>
+
+        <button class="btn-primary" form-type="submit" style="width: 100%; height: 86rpx; margin-top: 40rpx;" hover-class="hover-btn">
+          📝 注册并登录系统
+        </button>
+      </form>
+    </view>
+  </view>
+
+  <view class="footer-tips" wx:if="{{activeTab === 'login'}}">
+    <view>● 采购员：负责发起采购比价项目与供应商录入</view>
+    <view>● 工程部 / 项目部：负责按设定的依次路径完成审批与签字</view>
+  </view>
+</view>

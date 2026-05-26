@@ -1,0 +1,130 @@
+.report-header {
+  background-color: #f0fdf4;
+  border: 1rpx solid #bbf7d0;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: var(--card-shadow);
+}
+
+.header-icon {
+  font-size: 50rpx;
+  margin-bottom: 12rpx;
+}
+
+.header-text {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--success-color);
+}
+
+.header-desc {
+  font-size: 22rpx;
+  color: #166534;
+  margin-top: 12rpx;
+  line-height: 1.5;
+}
+
+.report-preview-card {
+  padding: 24rpx !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.preview-title {
+  font-size: 26rpx;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 20rpx;
+  width: 100%;
+}
+
+.report-pages-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+  background-color: #f3f4f6;
+  padding: 20rpx;
+  box-sizing: border-box;
+  border-radius: 16rpx;
+}
+
+.page-container {
+  width: 100%;
+  background-color: #ffffff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border-radius: 12rpx;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  border: 1rpx solid var(--border-color);
+}
+
+.report-page-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.page-number-hint {
+  font-size: 20rpx;
+  color: var(--text-muted);
+  padding: 15rpx 0;
+  border-top: 1rpx solid #f3f4f6;
+  width: 100%;
+  text-align: center;
+  font-weight: 600;
+  background-color: #fafafa;
+}
+
+.hidden-canvas {
+  width: 340px;
+  height: 481px;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -100;
+}
+
+.preview-tips {
+  font-size: 20rpx;
+  color: var(--text-muted);
+  margin-top: 20rpx;
+  text-align: center;
+}
+
+.action-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  margin-top: 20rpx;
+}
+
+.main-action {
+  width: 100% !important;
+  height: 90rpx;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+}
+
+.sub-action {
+  width: 100% !important;
+  height: 90rpx;
+}
+
+.back-action {
+  width: 100% !important;
+  height: 90rpx;
+  border-color: #9ca3af !important;
+  color: #4b5563 !important;
+}

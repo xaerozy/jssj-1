@@ -1,0 +1,240 @@
+.user-header {
+  background: var(--primary-gradient);
+  color: #ffffff;
+  padding: 40rpx 30rpx;
+  border-radius: 24rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+  box-shadow: 0 10px 20px rgba(26, 48, 92, 0.12);
+}
+
+.welcome-text {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.user-details {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 6rpx;
+}
+
+.user-name {
+  font-size: 34rpx;
+  font-weight: 700;
+}
+
+.user-role-badge {
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 20rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 8rpx;
+  font-weight: 600;
+}
+
+.switch-btn {
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1rpx solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  font-size: 24rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 30rpx;
+  margin: 0;
+  line-height: 1;
+}
+
+.stats-row {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.stat-box {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  padding: 24rpx 20rpx;
+  text-align: center;
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(26, 48, 92, 0.02);
+}
+
+.stat-num {
+  font-size: 40rpx;
+  font-weight: 700;
+  margin-bottom: 6rpx;
+}
+
+.color-warning {
+  color: var(--warning-color);
+}
+
+.color-primary {
+  color: #3b82f6;
+}
+
+.color-success {
+  color: var(--success-color);
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: var(--text-muted);
+}
+
+.filter-tabs {
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 6rpx;
+  margin-bottom: 30rpx;
+  box-shadow: var(--card-shadow);
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  font-size: 26rpx;
+  color: var(--text-muted);
+  padding: 16rpx 0;
+  font-weight: 600;
+  border-radius: 12rpx;
+  transition: all 0.2s;
+}
+
+.tab-item.active {
+  background-color: #f0f4fa;
+  color: var(--primary-color);
+}
+
+.list-scroll {
+  flex: 1;
+  height: calc(100vh - 460rpx);
+}
+
+.list-card {
+  transition: all 0.2s;
+  border-left: 8rpx solid #e5e7eb;
+}
+
+.list-card:active {
+  transform: translateY(2rpx);
+}
+
+.list-card:has(.action-alert) {
+  border-left-color: var(--warning-color);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1rpx solid var(--border-color);
+  padding-bottom: 20rpx;
+  margin-bottom: 20rpx;
+  gap: 20rpx;
+}
+
+.card-title-text {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text-main);
+  flex: 1;
+  line-height: 1.4;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.info-row {
+  display: flex;
+  font-size: 26rpx;
+}
+
+.info-row .label {
+  color: var(--text-muted);
+  width: 140rpx;
+  flex-shrink: 0;
+}
+
+.info-row .val {
+  color: var(--text-main);
+  flex: 1;
+}
+
+.item-summary {
+  background-color: #f8fafc;
+  padding: 12rpx 16rpx;
+  border-radius: 8rpx;
+  margin-top: 8rpx;
+}
+
+.card-footer {
+  margin-top: 24rpx;
+  border-top: 1rpx solid var(--border-color);
+  padding-top: 16rpx;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.action-alert {
+  background-color: var(--warning-light);
+  color: #b45309;
+  font-size: 24rpx;
+  font-weight: 700;
+  padding: 6rpx 18rpx;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.alert-icon {
+  font-size: 26rpx;
+  animation: flash 1.5s infinite;
+}
+
+@keyframes flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.view-detail-link {
+  font-size: 24rpx;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.float-add-btn {
+  position: fixed;
+  right: 40rpx;
+  bottom: 60rpx;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  padding: 20rpx 36rpx;
+  border-radius: 50rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+  z-index: 99;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.add-icon {
+  font-size: 36rpx;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.add-text {
+  font-size: 28rpx;
+  font-weight: 700;
+}

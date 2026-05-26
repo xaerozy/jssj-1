@@ -1,0 +1,38 @@
+<view class="container safe-bottom">
+  <view class="report-header" style="background: none; border: none; box-shadow: none; padding: 10rpx 0; margin-bottom: 20rpx;">
+    <view class="header-text" style="font-size: 32rpx;">已锁定防篡改比价单报告 (V{{project.version || '1.0'}})</view>
+  </view>
+
+  <!-- 报告实时多页预览 -->
+  <view class="card report-preview-card">
+    <view class="preview-title">📑 报告预览 (A4 标准物理分页版)</view>
+    
+    <view class="report-pages-list" wx:if="{{tempPagePaths.length > 0}}">
+      <block wx:for="{{tempPagePaths}}" wx:key="*this">
+        <view class="page-container">
+          <image class="report-page-image" src="{{item}}" mode="widthFix"></image>
+          <view class="page-number-hint">第 {{index + 1}} 页 / 共 {{tempPagePaths.length}} 页</view>
+        </view>
+      </block>
+    </view>
+    
+    <!-- 隐藏但处于屏幕视口内的 Canvas，保证微信底层强制渲染并在完成后自动销毁以防止顶起页面多出一页 -->
+    <canvas canvas-id="reportCanvas" class="hidden-canvas" wx:if="{{tempPagePaths.length === 0}}"></canvas>
+    
+    <view class="preview-tips" wx:if="{{tempPagePaths.length === 0}}">⚡ 正在使用 Canvas 进行 A4 物理分页排版中...</view>
+    <view class="preview-tips" wx:else>💡 已为您自动进行物理分页，左右无留白，可一键发送或保存</view>
+  </view>
+
+  <!-- 导出操作栏 -->
+  <view class="action-card">
+    <button class="btn-primary main-action" hover-class="hover-btn" bindtap="onSaveImage">
+      📥 一键保存多页 A4 报告到相册
+    </button>
+    <button class="btn-secondary sub-action" hover-class="hover-btn" bindtap="onExportPDF">
+      ✉️ 发送不可修改 A4 比价单给好友
+    </button>
+    <button class="btn-secondary back-action" hover-class="hover-btn" bindtap="onBack">
+      返回详情页
+    </button>
+  </view>
+</view>

@@ -1,0 +1,367 @@
+.login-container {
+  min-height: 100vh;
+  background-color: #f4f6fa;
+  padding: 40rpx;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 280rpx;
+  background: linear-gradient(135deg, #1a305c 0%, #2e4d82 100%);
+  border-bottom-left-radius: 60rpx;
+  border-bottom-right-radius: 60rpx;
+  z-index: 1;
+}
+
+.logo-area {
+  z-index: 2;
+  margin-top: 15rpx;
+  margin-bottom: 20rpx;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-box {
+  width: 80rpx;
+  height: 80rpx;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44rpx;
+  margin-bottom: 10rpx;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.app-title {
+  color: #ffffff;
+  font-size: 32rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.app-subtitle {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 20rpx;
+  margin-top: 10rpx;
+  text-transform: uppercase;
+  letter-spacing: 1rpx;
+}
+
+.login-card {
+  z-index: 2;
+  background-color: #ffffff;
+  width: 100%;
+  border-radius: 32rpx;
+  padding: 30rpx;
+  box-shadow: 0 10px 30px rgba(26, 48, 92, 0.08);
+  border: 1px solid rgba(26, 48, 92, 0.02);
+}
+
+.card-desc {
+  font-size: 26rpx;
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 30rpx;
+  background-color: #f8fafc;
+  padding: 20rpx;
+  border-radius: 16rpx;
+  border-left: 6rpx solid #1a305c;
+}
+
+.role-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.role-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  background-color: #ffffff;
+  border: 2rpx solid #e5e7eb;
+  border-radius: 20rpx;
+  transition: all 0.2s ease;
+}
+
+.role-item:active {
+  border-color: #1a305c;
+  background-color: #f0f4fa;
+}
+
+.role-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background-color: #1a305c;
+  color: #ffffff;
+  font-size: 36rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+  box-shadow: 0 4px 10px rgba(26, 48, 92, 0.15);
+}
+
+.role-info {
+  flex: 1;
+}
+
+.role-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1f2937;
+  display: inline-block;
+  margin-right: 12rpx;
+}
+
+.role-tag {
+  display: inline-block;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  font-size: 20rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 8rpx;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.role-desc {
+  font-size: 24rpx;
+  color: #6b7280;
+  margin-top: 6rpx;
+}
+
+.enter-arrow {
+  color: #9ca3af;
+  font-size: 32rpx;
+}
+
+.footer-tips {
+  z-index: 2;
+  margin-top: 40rpx;
+  font-size: 22rpx;
+  color: #9ca3af;
+  line-height: 1.6;
+  width: 100%;
+  padding: 0 20rpx;
+}
+
+/* ================= 选项卡及注册界面追加样式 ================= */
+.login-tabs {
+  display: flex;
+  border-bottom: 2rpx solid #e5e7eb;
+  margin-bottom: 30rpx;
+  gap: 20rpx;
+}
+
+.login-tabs-single {
+  display: flex;
+  justify-content: center;
+  border-bottom: 2rpx solid #e5e7eb;
+  margin-bottom: 30rpx;
+  padding-bottom: 20rpx;
+}
+
+.single-tab-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1a305c;
+  position: relative;
+}
+
+.single-tab-title::after {
+  content: "";
+  position: absolute;
+  bottom: -22rpx;
+  left: 10%;
+  width: 80%;
+  height: 6rpx;
+  background-color: #1a305c;
+  border-radius: 4rpx;
+}
+
+.login-tab {
+  flex: 1;
+  text-align: center;
+  font-size: 30rpx;
+  color: #6b7280;
+  padding-bottom: 20rpx;
+  font-weight: 700;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.login-tab.active {
+  color: #1a305c;
+}
+
+.login-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2rpx;
+  left: 20%;
+  width: 60%;
+  height: 6rpx;
+  background-color: #1a305c;
+  border-radius: 4rpx;
+}
+
+.role-scroll {
+  max-height: 540rpx;
+}
+
+.btn-import-wechat {
+  background-color: #e8f5e9 !important;
+  color: #2e7d32 !important;
+  border: 1rpx solid rgba(46, 125, 50, 0.2) !important;
+  font-size: 26rpx !important;
+  font-weight: 700 !important;
+  height: 80rpx !important;
+  border-radius: 16rpx !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 30rpx !important;
+  width: 100% !important;
+}
+
+.picker-input {
+  display: flex;
+  align-items: center;
+  color: #1f2937;
+  font-weight: 600;
+  background-color: #fafbfc;
+  border: 1rpx solid var(--border-color);
+  border-radius: 12rpx;
+  height: 80rpx;
+  padding: 0 24rpx;
+}
+
+.form-group {
+  margin-bottom: 20rpx;
+}
+
+.form-group .form-label {
+  display: block;
+  font-size: 24rpx;
+  color: #555555;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+/* ================= 平铺点选岗位身份样式 ================= */
+.role-select-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15rpx;
+  width: 100%;
+  margin-top: 10rpx;
+}
+
+.role-select-btn {
+  height: 72rpx;
+  border-radius: 12rpx;
+  background-color: #f8fafc;
+  border: 2rpx solid #e5e7eb;
+  color: #4b5563;
+  font-size: 24rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.role-select-btn:active {
+  transform: scale(0.97);
+}
+
+.role-select-btn.active {
+  background-color: #f0f4fa;
+  border-color: #1a305c;
+  color: #1a305c;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(26, 48, 92, 0.08);
+}
+
+/* ================= 垃圾桶注销账户及手机验证码发送样式 ================= */
+.delete-role-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #9ca3af;
+  margin-left: 20rpx;
+  margin-right: 10rpx;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  z-index: 5;
+}
+
+.delete-btn-hover {
+  background-color: #fee2e2 !important;
+  color: #ef4444 !important;
+  transform: scale(1.1);
+}
+
+.phone-input-wrap {
+  display: flex;
+  gap: 15rpx;
+  align-items: center;
+  width: 100%;
+}
+
+.phone-input {
+  flex: 1;
+}
+
+.btn-send-code {
+  width: 210rpx !important;
+  height: 80rpx !important;
+  font-size: 24rpx !important;
+  background-color: #1a305c !important;
+  color: #ffffff !important;
+  border-radius: 12rpx !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-weight: 600 !important;
+}
+
+.btn-send-code[disabled] {
+  background-color: #e5e7eb !important;
+  color: #9ca3af !important;
+  border: none !important;
+}
+
+.authed-tag {
+  font-size: 24rpx;
+  color: #2e7d32;
+  font-weight: 700;
+  background-color: #e8f5e9;
+  padding: 12rpx 24rpx;
+  border-radius: 10rpx;
+  border: 1rpx solid rgba(46, 125, 50, 0.2);
+  white-space: nowrap;
+}

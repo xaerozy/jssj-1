@@ -1,0 +1,18 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/list/list",
+    "pages/detail/detail",
+    "pages/create/create",
+    "pages/report/report"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#1a305c",
+    "navigationBarTitleText": "公司采购比价系统",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f4f6fa"
+  },
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}
